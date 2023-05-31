@@ -1,46 +1,33 @@
-#include <stdio.h>
 #include <string.h>
+#include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+// Value of 1024*1024
+#define MB 1048576;
 
-void cpuTemperature(FILE *fp, double *temp)
+void cpuTemperature(int *temp)
 {
-	char output[1024];
-	char *eptr;
-	// We want to ignore any errors from the sensors command.
-	char *cmd = "sensors  2>/dev/null | grep 'Package id 0:' | grep -o -P '(?<=\\+).*?(?=°)' | head -1";
-	/* Run the command given. */
-	fp = popen(cmd, "r");
-	// If the FilePointer is Null then no need to resume as no data will be fetched.
-	if (fp == NULL)
+	FILE *fptr;
+	fptr = fopen("/sys/class/thermal/thermal_zone3/temp", "r");
+	if (fptr == NULL)
 	{
-		printf("Failed to run command\n");
-		pclose(fp);
+		printf("Failed to read cpu temp\n");
+		fclose(fptr);
 		return;
 	}
-
-	/* Read the output a line at a time - output it. */
-	// Should have a if statement.
-	if (fgets(output, sizeof(output), fp) != NULL)
-	{
-		*temp = strtod(output, &eptr);
-	}
-	// debug print.
-	// printf("%s", output);
-	pclose(fp);
+	fscanf(fptr, "%i", temp);
+	*temp = *temp / 1000;
+	fclose(fptr);
 }
 
-//  Returns available memory of system in kb as given my meminfo. By default shows Free memory.
-void getSystemMemoryInformation(FILE *fp, int *mem, int memtype)
+//  Returns available memory of system in kb as given my meminfo.
+void getSystemMemoryInformation(int *mem, int memtype)
 {
-	char output[1024];
-	char *cmd = "grep 'MemFree: ' /proc/meminfo | grep -o -P '(?<= ).*?(?= )'";
-	if (memtype == 0)
-	{
-		cmd = "grep 'MemAvailable: ' /proc/meminfo | grep -o -P '(?<= ).*?(?= )'";
-	}
+	FILE *fp;
+	char *cmd = "cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*'";
 	if (memtype == 1)
 	{
-		cmd = "grep 'MemTotal: ' /proc/meminfo | grep -o -P '(?<= ).*?(?= )'";
+		cmd = "cat /proc/meminfo | grep -i 'memavailable' | grep -o '[[:digit:]]*'";
 	}
 	/* Open the command for reading. */
 	fp = popen(cmd, "r");
@@ -48,28 +35,10 @@ void getSystemMemoryInformation(FILE *fp, int *mem, int memtype)
 	if (fp == NULL)
 	{
 		printf("Failed to run command\n");
-		pclose(fp);
+		fclose(fp);
 		return;
 	}
-	/* Read the output a line at a time - output it. */
-	// Should have a if statement.
-	if (fgets(output, sizeof(output), fp) != NULL)
-	{
-		// Convert the string into a int.
-		*mem = atoi(output);
-	}
+	fscanf(fp, "%i", mem);
 	/* close */
-	pclose(fp);
+	fclose(fp);
 }
-
-// int main()
-// {
-// 	FILE *fp;
-// 	int mem;
-// 	double cpuTemp;
-// 	cpuTemperature(fp, &cpuTemp);
-// 	printf("%f  \n", cpuTemp);
-// 	getSystemMemoryInformation(fp, &mem, 0);
-// 	printf("%i \n", mem);
-// 	return 0;
-// }

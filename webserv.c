@@ -6,20 +6,19 @@
 #include <stdio.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include "systemstats.c"
+#include "systemstats.h"
 #include "handlesocket.h"
 
 int main()
 {
     struct sockaddr_in sockaddr_host;
-    FILE *fp;
-    double cpuTemp;
     int sockaddrlen = sizeof(sockaddr_host);
     int tcp_socket_fd;
     int newSocketfd;
     int clientAddress;
     int bytesRead;
-    char buffer[BUFFSIZE];
+    int cpuTemp;
+    int mem;
     // TCP Layer aka TRANSPORT LAYER. This is the lowest layer I will implement atm
     // 1. Create the socket
     //  Domain: IPv4, Type: STREAM SOCKET as required by TCP, Protocol: 0. as the IP header for TCP has only one protocol then 0 is given.
@@ -38,7 +37,6 @@ int main()
         {
             continue;
         }
-        printf("connection accepted\n");
 
         // With this we can read client address data. Aka adress and port;
         // This can be optional but is set in a way that it is not.
@@ -46,33 +44,48 @@ int main()
         {
             continue;
         }
-
+        char buffer[BUFFSIZE];
         // Read the socket of the file descriptor into the buffer.
         // Returned value is the count of the bytes read into the file.
         if (readSocketData(&newSocketfd, &bytesRead, buffer) == -1)
         {
             continue;
         }
-
-        // scans the request headers and adds them to the print.
-        char method[BUFFSIZE]; 
+        char method[BUFFSIZE];
         char uri[BUFFSIZE];
         char version[BUFFSIZE];
+        // Get the method, uri and version of the request from the buffer.
         sscanf(buffer, "%s %s %s", method, uri, version);
+        // printf("%s", uri);
         // socket address ip, port, request method, endpoint and HTTP version.
         printf("[%s:%u] %s %s %s\n", inet_ntoa(sockaddr_host.sin_addr), ntohs(sockaddr_host.sin_port), method, uri, version);
-
         // Check for endpoint here
         // Create data
         char resp[] = "HTTP/1.0 200 OK\r\n"
                       "Server: webserver-c\r\n"
                       "Content-type: text/html\r\n\r\n";
-        cpuTemperature(fp, &cpuTemp);
 
-        int converted_number = htonl(cpuTemp);
-        char bb[32];
-        sprintf(bb, "%lf", cpuTemp);
-        strcat(resp, bb);
+        if (strcmp(uri, "/cpu") == 0)
+        {
+            cpuTemperature(&cpuTemp);
+            char cpuTempString[32];
+            sprintf(cpuTempString, "%i", cpuTemp);
+            strcat(resp, cpuTempString);
+        }
+        if (strcmp(uri, "/memTotal") == 0)
+        {
+            getSystemMemoryInformation(&mem, 0);
+            char memString[32];
+            sprintf(memString, "%i", mem);
+            strcat(resp, memString);
+        }
+        if (strcmp(uri, "/memAvailable") == 0)
+        {
+            getSystemMemoryInformation(&mem, 1);
+            char memString[32];
+            sprintf(memString, "%i", mem);
+            strcat(resp, memString);
+        }
         // Data creation end
         int socketWrite = write(newSocketfd, resp, strlen(resp));
 
