@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <arpa/inet.h>
 #include <sys/socket.h>
-#include "systemstats.h"
-#include "handlesocket.h"
+#include "systeminfo/systemstats.h"
+#include "socket/handlesocket.h"
 
 int main()
 {
