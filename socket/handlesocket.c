@@ -13,6 +13,7 @@ int acceptRequest(int *originalSocketfd, int *newSocketfd, struct sockaddr_in so
         perror("Webserver socket accept error:");
         return -1;
     }
+    return 0;
 }
 
 int readClientData(int *socketfd, int *clientAddress, struct sockaddr_in *sockaddr_host, int sockaddrlen)
@@ -23,6 +24,7 @@ int readClientData(int *socketfd, int *clientAddress, struct sockaddr_in *sockad
         perror("ClientAddress socket read error");
         return -1;
     }
+    return 0;
 }
 
 int readSocketData(int *socketfd, int *readByes, char buffer[])
@@ -35,6 +37,7 @@ int readSocketData(int *socketfd, int *readByes, char buffer[])
         perror("Webserver socket read error");
         return -1;
     }
+    return 0;
 }
 
 int setupSocket(int *socketfd, struct sockaddr_in sockaddr_host, int *sockaddrlen)
@@ -76,6 +79,6 @@ int setupSocket(int *socketfd, struct sockaddr_in sockaddr_host, int *sockaddrle
         perror("Webserver socket listen error");
         return 1;
     }
-
+    return 0;
     printf("Listening to socket\n");
 }

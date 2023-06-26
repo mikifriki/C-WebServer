@@ -42,3 +42,30 @@ void getSystemMemoryInformation(int *mem, int memtype)
 	/* close */
 	fclose(fp);
 }
+
+void readTop()
+{
+	FILE *fp;
+	//char *cmd ="top -b -n 1";
+	char *cmd = "top -l 1";
+	fp = popen(cmd, "r");
+	int a = 0;
+	if (fp == NULL)
+	{
+		printf("Failed to run command\n");
+		fclose(fp);
+		return;
+	}
+	char string[150];
+	while (fgets(string, 150, fp))
+	{	
+		printf("%s", string);
+	}
+	// free(fp);
+}
+
+// Main is for testing the top command currently.
+void main()
+{
+	readTop();
+}
