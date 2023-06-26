@@ -43,10 +43,11 @@ void getSystemMemoryInformation(int *mem, int memtype)
 	fclose(fp);
 }
 
-void readTop()
+// Reads the current total running processes on the machine
+void getTotalProcesses()
 {
 	FILE *fp;
-	//char *cmd ="top -b -n 1";
+	// char *cmd ="top -b -n 1";
 	char *cmd = "top -l 1";
 	fp = popen(cmd, "r");
 	int a = 0;
@@ -57,15 +58,33 @@ void readTop()
 		return;
 	}
 	char string[150];
+	char *pointerchar;
+	int readNext = 0;
 	while (fgets(string, 150, fp))
-	{	
-		printf("%s", string);
+	{
+		pointerchar = strtok(string, " \t");
+		while (pointerchar != NULL)
+		{
+
+			if (strcasecmp(pointerchar, "Processes:") == 0 || strcasecmp(pointerchar, "Tasks:") == 0)
+			{
+				readNext = 1;
+				// As we know we want the next value then just print it.
+				pointerchar = strtok(NULL, " \t");
+				printf("%s", pointerchar);
+				return;
+			}
+
+			pointerchar = strtok(NULL, " \t");
+		}
 	}
-	// free(fp);
+
+	fclose(fp);
 }
 
 // Main is for testing the top command currently.
-void main()
+int main()
 {
-	readTop();
+	readTopMac();
+	return 0;
 }
