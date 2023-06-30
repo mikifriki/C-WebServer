@@ -96,7 +96,7 @@ int main()
         }
         if (strcmp(uri, "/availableStorage") == 0)
         {
-            systemStorageSpace(&storageSize, "total");
+            systemStorageSpace(&storageSize, "available");
             char memString[32];
             sprintf(memString, "%i", 1);
             // strcat fails for some reason here.
