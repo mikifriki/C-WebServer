@@ -5,6 +5,33 @@
 // Value of 1024*1024
 #define MB 1048576;
 
+static void returnStorageSize(char **pointerchar, char **storageType, int *i)
+{
+	while (*pointerchar != NULL)
+	{
+		(*i)++;
+		// Reuse the I variable from above
+		// It is ugly but works for the moment
+		// If the I is 5 then we can read avaiable disk space.
+		// if I is 3 then we get total size
+		if (strcasecmp(*storageType, "total") == 0 && *i == 1)
+		{
+
+			// printf("%i", *i);
+			*pointerchar = strtok(NULL, " ");
+			break;
+		}
+		if (strcasecmp(*storageType, "available") == 0 && *i == 3)
+		{
+			// printf("%i - here __  ", *i);
+			*pointerchar = strtok(NULL, " ");
+			break;
+		}
+
+		*pointerchar = strtok(NULL, " ");
+	}
+}
+
 void cpuTemperature(int *temp)
 {
 	FILE *fptr;
@@ -44,10 +71,11 @@ void getSystemMemoryInformation(int *mem, int memtype)
 }
 
 // Reads the current total running processes on the machine
+// Needs to be implemented
 void getTotalProcesses()
 {
 	FILE *fp;
-	// char *cmd ="top -b -n 1";
+	// char *cmd = "top -b -n 1";
 	char *cmd = "top -l 1";
 	fp = popen(cmd, "r");
 	int a = 0;
@@ -59,32 +87,76 @@ void getTotalProcesses()
 	}
 	char string[150];
 	char *pointerchar;
-	int readNext = 0;
 	while (fgets(string, 150, fp))
 	{
 		pointerchar = strtok(string, " \t");
 		while (pointerchar != NULL)
 		{
-
 			if (strcasecmp(pointerchar, "Processes:") == 0 || strcasecmp(pointerchar, "Tasks:") == 0)
 			{
-				readNext = 1;
 				// As we know we want the next value then just print it.
 				pointerchar = strtok(NULL, " \t");
 				printf("%s", pointerchar);
 				return;
 			}
-
+			// Read rest of the tokeized string.
 			pointerchar = strtok(NULL, " \t");
 		}
 	}
+	fclose(fp);
+}
 
+// Returns storage size based off of storageType.
+// gets available or total.
+// returns nothing if none of these strings are given.
+void systemStorageSpace(int *storage, char *storageType)
+{
+	printf("%s", "system Storage  ");
+	if (strcasecmp(storageType, "total") != 0 && strcasecmp(storageType, "available") != 0)
+	{
+		return;
+	}
+	FILE *fp;
+	char *cmd = "df -H /";
+	/* Open the command for reading. */
+	fp = popen(cmd, "r");
+	// If the FilePointer is Null then no need to resume as no data will be fetched.
+	if (fp == NULL)
+	{
+		printf("Failed to read disk space command\n");
+		fclose(fp);
+		return;
+	}
+
+	char tokenizedString[150];
+	char *pointerchar;
+	int i = 0;
+	int readLine = 0;
+	while (fgets(tokenizedString, 150, fp))
+	{
+		// Skip the initial row as we dont need to read it.
+		i++;
+		if (i == 1)
+		{
+			continue;
+		}
+		pointerchar = strtok(tokenizedString, " ");
+		returnStorageSize(&pointerchar, &storageType, &readLine);
+		break;
+	}
+	// Remove last character from string
+	pointerchar[strlen(pointerchar) - 1] = '\0';
+	*storage = atoi(pointerchar);
+	/* close */
 	fclose(fp);
 }
 
 // Main is for testing the top command currently.
-int main()
-{
-	readTopMac();
-	return 0;
-}
+// int main()
+// {
+// 	int i = 0;
+// 	// getTotalProcesses();
+// 	systemStorageSpace(&i, "total");
+// 	printf("%i", i);
+// 	return 0;
+// }

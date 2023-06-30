@@ -19,6 +19,7 @@ int main()
     int bytesRead;
     int cpuTemp;
     int mem;
+    int storageSize = 0;
     // TCP Layer aka TRANSPORT LAYER. This is the lowest layer I will implement atm
     // 1. Create the socket
     //  Domain: IPv4, Type: STREAM SOCKET as required by TCP, Protocol: 0. as the IP header for TCP has only one protocol then 0 is given.
@@ -30,7 +31,6 @@ int main()
     }
 
     // Now we go onto accept the incoming connections
-
     for (;;)
     {
         if (acceptRequest(&tcp_socket_fd, &newSocketfd, sockaddr_host, sockaddrlen) == -1)
@@ -56,7 +56,6 @@ int main()
         char version[BUFFSIZE];
         // Get the method, uri and version of the request from the buffer.
         sscanf(buffer, "%s %s %s", method, uri, version);
-        // printf("%s", uri);
         // socket address ip, port, request method, endpoint and HTTP version.
         printf("[%s:%u] %s %s %s\n", inet_ntoa(sockaddr_host.sin_addr), ntohs(sockaddr_host.sin_port), method, uri, version);
         // Check for endpoint here
@@ -84,6 +83,24 @@ int main()
             getSystemMemoryInformation(&mem, 1);
             char memString[32];
             sprintf(memString, "%i", mem);
+            strcat(resp, memString);
+        }
+        if (strcmp(uri, "/totalStorage") == 0)
+        {
+            systemStorageSpace(&storageSize, "total");
+            char memString[32];
+            sprintf(memString, "%i", 1);
+            // strcat fails on MacOs for some reason here.
+            // Look into it.
+            strcat(resp, memString);
+        }
+        if (strcmp(uri, "/availableStorage") == 0)
+        {
+            systemStorageSpace(&storageSize, "total");
+            char memString[32];
+            sprintf(memString, "%i", 1);
+            // strcat fails for some reason here.
+            // Look into it.
             strcat(resp, memString);
         }
         // Data creation end

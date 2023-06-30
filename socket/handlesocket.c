@@ -79,6 +79,6 @@ int setupSocket(int *socketfd, struct sockaddr_in sockaddr_host, int *sockaddrle
         perror("Webserver socket listen error");
         return 1;
     }
-    return 0;
     printf("Listening to socket\n");
+    return 0;
 }
