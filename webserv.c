@@ -19,7 +19,7 @@ int main()
     int bytesRead;
     int cpuTemp;
     int mem;
-    int storageSize = 0;
+    int storageSize;
     // TCP Layer aka TRANSPORT LAYER. This is the lowest layer I will implement atm
     // 1. Create the socket
     //  Domain: IPv4, Type: STREAM SOCKET as required by TCP, Protocol: 0. as the IP header for TCP has only one protocol then 0 is given.
@@ -60,7 +60,7 @@ int main()
         printf("[%s:%u] %s %s %s\n", inet_ntoa(sockaddr_host.sin_addr), ntohs(sockaddr_host.sin_port), method, uri, version);
         // Check for endpoint here
         // Create data
-        char resp[] = "HTTP/1.0 200 OK\r\n"
+        char resp[150] = "HTTP/1.0 200 OK\r\n"
                       "Server: webserver-c\r\n"
                       "Content-type: text/html\r\n\r\n";
 
@@ -89,18 +89,14 @@ int main()
         {
             systemStorageSpace(&storageSize, "total");
             char memString[32];
-            sprintf(memString, "%i", 1);
-            // strcat fails on MacOs for some reason here.
-            // Look into it.
+            sprintf(memString, "%i", storageSize);
             strcat(resp, memString);
         }
         if (strcmp(uri, "/availableStorage") == 0)
         {
             systemStorageSpace(&storageSize, "available");
             char memString[32];
-            sprintf(memString, "%i", 1);
-            // strcat fails for some reason here.
-            // Look into it.
+            sprintf(memString, "%i", storageSize);
             strcat(resp, memString);
         }
         // Data creation end

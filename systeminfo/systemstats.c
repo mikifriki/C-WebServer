@@ -10,24 +10,18 @@ static void returnStorageSize(char **pointerchar, char **storageType, int *i)
 	while (*pointerchar != NULL)
 	{
 		(*i)++;
-		// Reuse the I variable from above
-		// It is ugly but works for the moment
-		// If the I is 5 then we can read avaiable disk space.
-		// if I is 3 then we get total size
+		// If the I value is 1 then we are reading total section. 
 		if (strcasecmp(*storageType, "total") == 0 && *i == 1)
 		{
-
-			// printf("%i", *i);
 			*pointerchar = strtok(NULL, " ");
 			break;
 		}
+		// If the I value is 1 then we are reading available section. 
 		if (strcasecmp(*storageType, "available") == 0 && *i == 3)
 		{
-			// printf("%i - here __  ", *i);
 			*pointerchar = strtok(NULL, " ");
 			break;
 		}
-
 		*pointerchar = strtok(NULL, " ");
 	}
 }
@@ -62,12 +56,12 @@ void getSystemMemoryInformation(int *mem, int memtype)
 	if (fp == NULL)
 	{
 		printf("Failed to run command\n");
-		fclose(fp);
+		pclose(fp);
 		return;
 	}
 	fscanf(fp, "%i", mem);
 	/* close */
-	fclose(fp);
+	pclose(fp);
 }
 
 // Reads the current total running processes on the machine
@@ -82,7 +76,7 @@ void getTotalProcesses()
 	if (fp == NULL)
 	{
 		printf("Failed to run command\n");
-		fclose(fp);
+		pclose(fp);
 		return;
 	}
 	char string[150];
@@ -103,7 +97,7 @@ void getTotalProcesses()
 			pointerchar = strtok(NULL, " \t");
 		}
 	}
-	fclose(fp);
+	pclose(fp);
 }
 
 // Returns storage size based off of storageType.
@@ -111,7 +105,6 @@ void getTotalProcesses()
 // returns nothing if none of these strings are given.
 void systemStorageSpace(int *storage, char *storageType)
 {
-	printf("%s", "system Storage  ");
 	if (strcasecmp(storageType, "total") != 0 && strcasecmp(storageType, "available") != 0)
 	{
 		return;
@@ -148,7 +141,7 @@ void systemStorageSpace(int *storage, char *storageType)
 	pointerchar[strlen(pointerchar) - 1] = '\0';
 	*storage = atoi(pointerchar);
 	/* close */
-	fclose(fp);
+	pclose(fp);
 }
 
 // Main is for testing the top command currently.
