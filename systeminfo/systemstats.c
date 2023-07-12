@@ -116,7 +116,8 @@ void getProcessesData(char *topLine, char*command)
 		pclose(fp);
 		return;
 	}
-	fgets(*topLine, 150, fp);
+	fgets(topLine, 120, fp);
+	strcat(topLine, "\n");
 	pclose(fp);
 }
 

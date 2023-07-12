@@ -101,10 +101,8 @@ int main()
         }
         if (strcmp(uri, "/getProccessData") == 0)
         {
-            char* testcmd = "7DaysToDieServer";
             char topLine[120];
-            getProcessesData(&topLine, testcmd);
-            sprintf(topLine, "%i", storageSize);
+            getProcessesData(topLine, "7DaysToDieServer");
             strcat(resp, topLine);
         }
         // Data creation end
