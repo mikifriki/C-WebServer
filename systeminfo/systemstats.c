@@ -10,13 +10,13 @@ static void returnStorageSize(char **pointerchar, char **storageType, int *i)
 	while (*pointerchar != NULL)
 	{
 		(*i)++;
-		// If the I value is 1 then we are reading total section. 
+		// If the I value is 1 then we are reading total section.
 		if (strcasecmp(*storageType, "total") == 0 && *i == 1)
 		{
 			*pointerchar = strtok(NULL, " ");
 			break;
 		}
-		// If the I value is 1 then we are reading available section. 
+		// If the I value is 1 then we are reading available section.
 		if (strcasecmp(*storageType, "available") == 0 && *i == 3)
 		{
 			*pointerchar = strtok(NULL, " ");
@@ -69,8 +69,8 @@ void getSystemMemoryInformation(int *mem, int memtype)
 void getTotalProcesses()
 {
 	FILE *fp;
-	// char *cmd = "top -b -n 1";
-	char *cmd = "top -l 1";
+	char *cmd = "top -b -n 1";
+	// char *cmd = "top -l 1";
 	fp = popen(cmd, "r");
 	int a = 0;
 	if (fp == NULL)
@@ -97,6 +97,26 @@ void getTotalProcesses()
 			pointerchar = strtok(NULL, " \t");
 		}
 	}
+	pclose(fp);
+}
+
+// Returns the top line of the given command.
+// this data includes cpu and ram usage. It also incldues uptime of the proccess.
+void getProcessesData(char *topLine, char*command)
+{
+	FILE *fp;
+	char baseCmd[100] = "top -u steam -bc -n 1  | grep ";
+	strcat(baseCmd, command);
+	// char *cmd = "top -l 1";
+	fp = popen(baseCmd, "r");
+	int a = 0;
+	if (fp == NULL)
+	{
+		printf("Failed to run command\n");
+		pclose(fp);
+		return;
+	}
+	fgets(*topLine, 150, fp);
 	pclose(fp);
 }
 
@@ -143,13 +163,3 @@ void systemStorageSpace(int *storage, char *storageType)
 	/* close */
 	pclose(fp);
 }
-
-// Main is for testing the top command currently.
-// int main()
-// {
-// 	int i = 0;
-// 	// getTotalProcesses();
-// 	systemStorageSpace(&i, "total");
-// 	printf("%i", i);
-// 	return 0;
-// }

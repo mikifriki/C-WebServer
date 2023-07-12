@@ -60,9 +60,9 @@ int main()
         printf("[%s:%u] %s %s %s\n", inet_ntoa(sockaddr_host.sin_addr), ntohs(sockaddr_host.sin_port), method, uri, version);
         // Check for endpoint here
         // Create data
-        char resp[150] = "HTTP/1.0 200 OK\r\n"
-                      "Server: webserver-c\r\n"
-                      "Content-type: text/html\r\n\r\n";
+        char resp[300] = "HTTP/1.0 200 OK\r\n"
+                         "Server: webserver-c\r\n"
+                         "Content-type: text/html\r\n\r\n";
 
         if (strcmp(uri, "/cpu") == 0)
         {
@@ -88,16 +88,24 @@ int main()
         if (strcmp(uri, "/totalStorage") == 0)
         {
             systemStorageSpace(&storageSize, "total");
-            char memString[32];
-            sprintf(memString, "%i", storageSize);
-            strcat(resp, memString);
+            char storageString[32];
+            sprintf(storageString, "%i", storageSize);
+            strcat(resp, storageString);
         }
         if (strcmp(uri, "/availableStorage") == 0)
         {
             systemStorageSpace(&storageSize, "available");
-            char memString[32];
-            sprintf(memString, "%i", storageSize);
-            strcat(resp, memString);
+            char storageString[32];
+            sprintf(storageString, "%i", storageSize);
+            strcat(resp, storageString);
+        }
+        if (strcmp(uri, "/getProccessData") == 0)
+        {
+            char* testcmd = "7DaysToDieServer";
+            char topLine[120];
+            getProcessesData(&topLine, testcmd);
+            sprintf(topLine, "%i", storageSize);
+            strcat(resp, topLine);
         }
         // Data creation end
         int socketWrite = write(newSocketfd, resp, strlen(resp));
