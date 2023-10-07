@@ -9,17 +9,17 @@ By Default the port used for localhost is 8080.
 
 ## Endpoints
 
-Endpoint: /cpu
-Returns the cpu temperature.
-Endpoint: /memTotal
-Returns the total memory (in kb) on the machine. 
-(uses meminfo)
-Endpoint: /memAvailable
-Returns the total memory (in kb) avaiable on the machine.
-(uses meminfo)
-Endpoint: /totalStorage
-Returns the total storage (in Gb) on the machine.
-Endpoint: /availableStorage
-Returns the total storage (in Gb) avaiable on the machine.
-Endpoint: /getProccessData?process=...
+Endpoint: /cpu \
+Returns the cpu temperature. \
+Endpoint: /memTotal \
+Returns the total memory (in kb) on the machine. \
+(uses meminfo) \
+Endpoint: /memAvailable \
+Returns the total memory (in kb) avaiable on the machine. \
+(uses meminfo) \
+Endpoint: /totalStorage \
+Returns the total storage (in Gb) on the machine. \
+Endpoint: /availableStorage \
+Returns the total storage (in Gb) avaiable on the machine. \
+Endpoint: /getProccessData?process=... \
 Returns information about the running process. At the moment it searches for the process with the user steam.
