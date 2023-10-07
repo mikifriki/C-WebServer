@@ -66,43 +66,43 @@ void getSystemMemoryInformation(int *mem, int memtype)
 
 // Reads the current total running processes on the machine
 // Needs to be implemented
-void getTotalProcesses()
-{
-	FILE *fp;
-	char *cmd = "top -b -n 1";
-	// char *cmd = "top -l 1";
-	fp = popen(cmd, "r");
-	int a = 0;
-	if (fp == NULL)
-	{
-		printf("Failed to run command\n");
-		pclose(fp);
-		return;
-	}
-	char string[150];
-	char *pointerchar;
-	while (fgets(string, 150, fp))
-	{
-		pointerchar = strtok(string, " \t");
-		while (pointerchar != NULL)
-		{
-			if (strcasecmp(pointerchar, "Processes:") == 0 || strcasecmp(pointerchar, "Tasks:") == 0)
-			{
-				// As we know we want the next value then just print it.
-				pointerchar = strtok(NULL, " \t");
-				printf("%s", pointerchar);
-				return;
-			}
-			// Read rest of the tokeized string.
-			pointerchar = strtok(NULL, " \t");
-		}
-	}
-	pclose(fp);
-}
+// void getTotalProcesses()
+// {
+// 	FILE *fp;
+// 	char *cmd = "top -b -n 1";
+// 	// char *cmd = "top -l 1";
+// 	fp = popen(cmd, "r");
+// 	int a = 0;
+// 	if (fp == NULL)
+// 	{
+// 		printf("Failed to run command\n");
+// 		pclose(fp);
+// 		return;
+// 	}
+// 	char string[150];
+// 	char *pointerchar;
+// 	while (fgets(string, 150, fp))
+// 	{
+// 		pointerchar = strtok(string, " \t");
+// 		while (pointerchar != NULL)
+// 		{
+// 			if (strcasecmp(pointerchar, "Processes:") == 0 || strcasecmp(pointerchar, "Tasks:") == 0)
+// 			{
+// 				// As we know we want the next value then just print it.
+// 				pointerchar = strtok(NULL, " \t");
+// 				printf("%s", pointerchar);
+// 				return;
+// 			}
+// 			// Read rest of the tokeized string.
+// 			pointerchar = strtok(NULL, " \t");
+// 		}
+// 	}
+// 	pclose(fp);
+// }
 
 // Returns the top line of the given command.
 // this data includes cpu and ram usage. It also incldues uptime of the proccess.
-void getProcessesData(char *topLine, char*command)
+void getProcessesData(char *topLine, char*command, int maxOutputLength)
 {
 	FILE *fp;
 	char baseCmd[100] = "top -u steam -bc -n 1  | grep ";
@@ -116,7 +116,7 @@ void getProcessesData(char *topLine, char*command)
 		pclose(fp);
 		return;
 	}
-	fgets(topLine, 120, fp);
+	fgets(topLine, maxOutputLength, fp);
 	strcat(topLine, "\n");
 	pclose(fp);
 }

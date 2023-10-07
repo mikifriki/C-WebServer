@@ -13,13 +13,7 @@ int main()
 {
     struct sockaddr_in sockaddr_host;
     int sockaddrlen = sizeof(sockaddr_host);
-    int tcp_socket_fd;
-    int newSocketfd;
-    int clientAddress;
-    int bytesRead;
-    int cpuTemp;
-    int mem;
-    int storageSize;
+    int tcp_socket_fd, newSocketfd, clientAddress, bytesRead, cpuTemp, mem, storageSize;
     // TCP Layer aka TRANSPORT LAYER. This is the lowest layer I will implement atm
     // 1. Create the socket
     //  Domain: IPv4, Type: STREAM SOCKET as required by TCP, Protocol: 0. as the IP header for TCP has only one protocol then 0 is given.
@@ -58,18 +52,18 @@ int main()
         sscanf(buffer, "%s %s %s", method, uri, version);
         // socket address ip, port, request method, endpoint and HTTP version.
         printf("[%s:%u] %s %s %s\n", inet_ntoa(sockaddr_host.sin_addr), ntohs(sockaddr_host.sin_port), method, uri, version);
-        // Check for endpoint here
-        // Create data
-        char resp[300] = "HTTP/1.0 200 OK\r\n"
+
+        char resp[450] = "HTTP/1.0 200 OK\r\n"
                          "Server: webserver-c\r\n"
                          "Content-type: text/html\r\n\r\n";
-
         if (strcmp(uri, "/cpu") == 0)
         {
             cpuTemperature(&cpuTemp);
             char cpuTempString[32];
             sprintf(cpuTempString, "%i", cpuTemp);
             strcat(resp, cpuTempString);
+            returnResponseData(newSocketfd, resp);
+            continue;
         }
         if (strcmp(uri, "/memTotal") == 0)
         {
@@ -77,6 +71,8 @@ int main()
             char memString[32];
             sprintf(memString, "%i", mem);
             strcat(resp, memString);
+            returnResponseData(newSocketfd, resp);
+            continue;
         }
         if (strcmp(uri, "/memAvailable") == 0)
         {
@@ -84,6 +80,8 @@ int main()
             char memString[32];
             sprintf(memString, "%i", mem);
             strcat(resp, memString);
+            returnResponseData(newSocketfd, resp);
+            continue;
         }
         if (strcmp(uri, "/totalStorage") == 0)
         {
@@ -91,6 +89,8 @@ int main()
             char storageString[32];
             sprintf(storageString, "%i", storageSize);
             strcat(resp, storageString);
+            returnResponseData(newSocketfd, resp);
+            continue;
         }
         if (strcmp(uri, "/availableStorage") == 0)
         {
@@ -98,24 +98,25 @@ int main()
             char storageString[32];
             sprintf(storageString, "%i", storageSize);
             strcat(resp, storageString);
-        }
-        if (strcmp(uri, "/getProccessData") == 0)
-        {
-            char topLine[120];
-            getProcessesData(topLine, "7DaysToDieServer");
-            strcat(resp, topLine);
-        }
-        // Data creation end
-        int socketWrite = write(newSocketfd, resp, strlen(resp));
-
-        if (socketWrite < 0)
-        {
-            perror("Webserver socket write error");
+            returnResponseData(newSocketfd, resp);
             continue;
         }
-        /* code */
-
-        close(newSocketfd);
+        if (strstr(uri, "/getProccessData? ") == 0)
+        {
+            int maxOutputLength = 300;
+            char topLine[maxOutputLength];
+            char *const sep_at = strchr(uri, '=');
+            char processName[20];
+            if (sep_at == NULL)
+            {
+                printf("first part: '%s'\nsecond part: '%s'\n", uri, sep_at + 1);
+                continue;
+            }
+            getProcessesData(topLine, sep_at + 1, maxOutputLength);
+            strcat(resp, topLine);
+            returnResponseData(newSocketfd, resp);
+            continue;
+        }
     }
 
     close(tcp_socket_fd);

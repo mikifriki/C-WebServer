@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <arpa/inet.h>
+#include <string.h>
 #include "handlesocket.h"
 int acceptRequest(int *originalSocketfd, int *newSocketfd, struct sockaddr_in sockaddr_host, int sockaddrlen)
 {
@@ -37,6 +38,18 @@ int readSocketData(int *socketfd, int *readByes, char buffer[])
         perror("Webserver socket read error");
         return -1;
     }
+    return 0;
+}
+
+int returnResponseData(int newSocketfd, char *response)
+{
+    int socketWrite = write(newSocketfd, response, strlen(response));
+    if (socketWrite < 0)
+    {
+        perror("Webserver socket write error");
+        return 1;
+    }
+    close(newSocketfd);
     return 0;
 }
 
