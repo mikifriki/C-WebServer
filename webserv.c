@@ -8,12 +8,13 @@
 #include <sys/socket.h>
 #include "systeminfo/systemstats.h"
 #include "socket/handlesocket.h"
-
+#define SMALLSTRINGBUFFER 32
 int main()
 {
     struct sockaddr_in sockaddr_host;
     int sockaddrlen = sizeof(sockaddr_host);
     int tcp_socket_fd, newSocketfd, clientAddress, bytesRead, cpuTemp, mem, storageSize;
+    char *headerString = "HTTP/1.0 200 OK\r\n Server: webserver-c r\n Content-type: text/html; charset=UTF-8 \r\n\r\n";
     // TCP Layer aka TRANSPORT LAYER. This is the lowest layer I will implement atm
     // 1. Create the socket
     //  Domain: IPv4, Type: STREAM SOCKET as required by TCP, Protocol: 0. as the IP header for TCP has only one protocol then 0 is given.
@@ -53,55 +54,47 @@ int main()
         // socket address ip, port, request method, endpoint and HTTP version.
         printf("[%s:%u] %s %s %s\n", inet_ntoa(sockaddr_host.sin_addr), ntohs(sockaddr_host.sin_port), method, uri, version);
 
-        char resp[450] = "HTTP/1.0 200 OK\r\n"
-                         "Server: webserver-c\r\n"
-                         "Content-type: text/html\r\n\r\n";
         if (strcmp(uri, "/cpu") == 0)
         {
             cpuTemperature(&cpuTemp);
-            char cpuTempString[32];
-            sprintf(cpuTempString, "%i", cpuTemp);
-            strcat(resp, cpuTempString);
-            returnResponseData(newSocketfd, resp);
+            char cpuTempString[SMALLSTRINGBUFFER];
+            snprintf(cpuTempString, SMALLSTRINGBUFFER, "%i", cpuTemp);
+            returnResponseData(newSocketfd, headerString, cpuTempString, strlen(cpuTempString), strlen(headerString));
             continue;
         }
         if (strcmp(uri, "/memTotal") == 0)
         {
             getSystemMemoryInformation(&mem, 0);
-            char memString[32];
-            sprintf(memString, "%i", mem);
-            strcat(resp, memString);
-            returnResponseData(newSocketfd, resp);
+            char memString[SMALLSTRINGBUFFER];
+            snprintf(memString, SMALLSTRINGBUFFER, "%i", mem);
+            returnResponseData(newSocketfd, headerString, memString, strlen(memString), strlen(headerString));
             continue;
         }
         if (strcmp(uri, "/memAvailable") == 0)
         {
             getSystemMemoryInformation(&mem, 1);
-            char memString[32];
-            sprintf(memString, "%i", mem);
-            strcat(resp, memString);
-            returnResponseData(newSocketfd, resp);
+            char memString[SMALLSTRINGBUFFER];
+            snprintf(memString, SMALLSTRINGBUFFER, "%i", mem);
+            returnResponseData(newSocketfd, headerString, memString, strlen(memString), strlen(headerString));
             continue;
         }
         if (strcmp(uri, "/totalStorage") == 0)
         {
             systemStorageSpace(&storageSize, "total");
-            char storageString[32];
-            sprintf(storageString, "%i", storageSize);
-            strcat(resp, storageString);
-            returnResponseData(newSocketfd, resp);
+            char storageString[SMALLSTRINGBUFFER];
+            snprintf(storageString, SMALLSTRINGBUFFER, "%i", storageSize);
+            returnResponseData(newSocketfd, headerString, storageString, strlen(storageString), strlen(headerString));
             continue;
         }
         if (strcmp(uri, "/availableStorage") == 0)
         {
             systemStorageSpace(&storageSize, "available");
-            char storageString[32];
-            sprintf(storageString, "%i", storageSize);
-            strcat(resp, storageString);
-            returnResponseData(newSocketfd, resp);
+            char storageString[SMALLSTRINGBUFFER];
+            snprintf(storageString, SMALLSTRINGBUFFER, "%i", storageSize);
+            returnResponseData(newSocketfd, headerString, storageString, strlen(storageString), strlen(headerString));
             continue;
         }
-        if (strstr(uri, "/getProccessData? ") == 0)
+        if (strstr(uri, "/getProccessData") != NULL)
         {
             int maxOutputLength = 300;
             char topLine[maxOutputLength];
@@ -109,14 +102,19 @@ int main()
             char processName[20];
             if (sep_at == NULL)
             {
-                printf("first part: '%s'\nsecond part: '%s'\n", uri, sep_at + 1);
-                continue;
+                printf("first part: '%s'\nsecond part: '%s'\n", uri, sep_at);
+                goto noendpoint;
             }
             getProcessesData(topLine, sep_at + 1, maxOutputLength);
-            strcat(resp, topLine);
-            returnResponseData(newSocketfd, resp);
+            returnResponseData(newSocketfd, headerString, topLine, strlen(topLine), strlen(headerString));
             continue;
         }
+        goto noendpoint;
+
+    // Default end if no results are found
+    noendpoint:
+        returnResponseData(newSocketfd, headerString, "no endpoint", strlen("no endpoint"), strlen(headerString));
+        continue;
     }
 
     close(tcp_socket_fd);
