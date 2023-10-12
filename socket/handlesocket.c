@@ -41,9 +41,13 @@ int readSocketData(int *socketfd, int *readByes, char buffer[])
     return 0;
 }
 
-int returnResponseData(int newSocketfd, char *response)
+int returnResponseData(int newSocketfd, char *headerString, char *responseString, int headerLength, int responseLength)
 {
-    int socketWrite = write(newSocketfd, response, strlen(response));
+    // We account for the space taken up with the snprintf with the +2
+    int fullResponseLength = responseLength + headerLength + 2;
+    char fullResponse[fullResponseLength];
+    snprintf(fullResponse, fullResponseLength, "%s %s", headerString, responseString);
+    int socketWrite = write(newSocketfd, fullResponse, strlen(fullResponse));
     if (socketWrite < 0)
     {
         perror("Webserver socket write error");

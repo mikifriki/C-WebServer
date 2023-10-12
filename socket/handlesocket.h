@@ -6,5 +6,5 @@ int setupSocket(int *socketfd, struct sockaddr_in sockaddr_host, int *sockaddrle
 int acceptRequest(int *originalSocketfd, int *newSocketfd, struct sockaddr_in sockaddr_host, int sockaddrlen);
 int readClientData(int *socketfd, int *clientAddress, struct sockaddr_in *sockaddr_host, int sockaddrlen);
 int readSocketData(int *socketfd, int *readByes, char buffer[]);
-int returnResponseData(int newSocketfd, char *response);
+int returnResponseData(int newSocketfd, char *headerString, char*responseString, int headerLength, int responseLength);
 #endif
