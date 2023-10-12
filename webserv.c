@@ -1,4 +1,3 @@
-
 #include <errno.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -9,6 +8,8 @@
 #include "systeminfo/systemstats.h"
 #include "socket/handlesocket.h"
 #define SMALLSTRINGBUFFER 32
+#define NOENDPOINT "no endpoint"
+#define SYSTEMONLINE "Online"
 int main()
 {
     struct sockaddr_in sockaddr_host;
@@ -54,6 +55,11 @@ int main()
         // socket address ip, port, request method, endpoint and HTTP version.
         printf("[%s:%u] %s %s %s\n", inet_ntoa(sockaddr_host.sin_addr), ntohs(sockaddr_host.sin_port), method, uri, version);
 
+        if (strcmp(uri, "/status"))
+        {
+            returnResponseData(newSocketfd, headerString, SYSTEMONLINE, strlen(SYSTEMONLINE), strlen(headerString));
+            continue;
+        }
         if (strcmp(uri, "/cpu") == 0)
         {
             cpuTemperature(&cpuTemp);
@@ -113,7 +119,7 @@ int main()
 
     // Default end if no results are found
     noendpoint:
-        returnResponseData(newSocketfd, headerString, "no endpoint", strlen("no endpoint"), strlen(headerString));
+        returnResponseData(newSocketfd, headerString, NOENDPOINT, strlen(NOENDPOINT), strlen(headerString));
         continue;
     }
 

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include "systemstats.h"
 // Value of 1024*1024
 #define MB 1048576;
 
@@ -11,13 +12,13 @@ static void returnStorageSize(char **pointerchar, char **storageType, int *i)
 	{
 		(*i)++;
 		// If the I value is 1 then we are reading total section.
-		if (strcasecmp(*storageType, "total") == 0 && *i == 1)
+		if (strncasecmp(*storageType, TOTALSTORAGE, strlen(TOTALSTORAGE)) == 0 && *i == 1)
 		{
 			*pointerchar = strtok(NULL, " ");
 			break;
 		}
 		// If the I value is 1 then we are reading available section.
-		if (strcasecmp(*storageType, "available") == 0 && *i == 3)
+		if (strncasecmp(*storageType, AVAILABLESTORAGE, strlen(AVAILABLESTORAGE)) == 0 && *i == 3)
 		{
 			*pointerchar = strtok(NULL, " ");
 			break;
@@ -126,7 +127,7 @@ void getProcessesData(char *topLine, char*command, int maxOutputLength)
 // returns nothing if none of these strings are given.
 void systemStorageSpace(int *storage, char *storageType)
 {
-	if (strcasecmp(storageType, "total") != 0 && strcasecmp(storageType, "available") != 0)
+	if (strcasecmp(storageType, TOTALSTORAGE) != 0 && strcasecmp(storageType, AVAILABLESTORAGE) != 0)
 	{
 		return;
 	}
