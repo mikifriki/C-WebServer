@@ -55,7 +55,7 @@ int main()
         // socket address ip, port, request method, endpoint and HTTP version.
         printf("[%s:%u] %s %s %s\n", inet_ntoa(sockaddr_host.sin_addr), ntohs(sockaddr_host.sin_port), method, uri, version);
 
-        if (strcmp(uri, "/status"))
+        if (strcmp(uri, "/status") == 0)
         {
             returnResponseData(newSocketfd, headerString, SYSTEMONLINE, strlen(SYSTEMONLINE), strlen(headerString));
             continue;
