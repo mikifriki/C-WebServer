@@ -6,19 +6,20 @@
 // Value of 1024*1024
 #define MB 1048576;
 
-static void returnStorageSize(char **pointerchar, char **storageType, int *i)
+static void returnStorageSize(char **pointerchar, char *storageType)
 {
+	int readLine = 0;
 	while (*pointerchar != NULL)
 	{
-		(*i)++;
+		(readLine)++;
 		// If the I value is 1 then we are reading total section.
-		if (strncasecmp(*storageType, TOTALSTORAGE, strlen(TOTALSTORAGE)) == 0 && *i == 1)
+		if (strncasecmp(storageType, TOTALSTORAGE, strlen(TOTALSTORAGE)) == 0 && readLine == 1)
 		{
 			*pointerchar = strtok(NULL, " ");
 			break;
 		}
 		// If the I value is 1 then we are reading available section.
-		if (strncasecmp(*storageType, AVAILABLESTORAGE, strlen(AVAILABLESTORAGE)) == 0 && *i == 3)
+		if (strncasecmp(storageType, AVAILABLESTORAGE, strlen(AVAILABLESTORAGE)) == 0 && readLine == 3)
 		{
 			*pointerchar = strtok(NULL, " ");
 			break;
@@ -103,7 +104,7 @@ void getSystemMemoryInformation(int *mem, int memtype)
 
 // Returns the top line of the given command.
 // this data includes cpu and ram usage. It also incldues uptime of the proccess.
-void getProcessesData(char *topLine, char*command, int maxOutputLength)
+void getProcessesData(char *topLine, char *command, int maxOutputLength)
 {
 	FILE *fp;
 	char baseCmd[100] = "top -u steam -bc -n 1  | grep ";
@@ -146,7 +147,6 @@ void systemStorageSpace(int *storage, char *storageType)
 	char tokenizedString[150];
 	char *pointerchar;
 	int i = 0;
-	int readLine = 0;
 	while (fgets(tokenizedString, 150, fp))
 	{
 		// Skip the initial row as we dont need to read it.
@@ -156,12 +156,30 @@ void systemStorageSpace(int *storage, char *storageType)
 			continue;
 		}
 		pointerchar = strtok(tokenizedString, " ");
-		returnStorageSize(&pointerchar, &storageType, &readLine);
+		returnStorageSize(&pointerchar, storageType);
 		break;
 	}
 	// Remove last character from string
 	pointerchar[strlen(pointerchar) - 1] = '\0';
 	*storage = atoi(pointerchar);
+	/* close */
+	pclose(fp);
+}
+
+void getSystemName(char *machineName, int maxLength)
+{
+	FILE *fp;
+	char *cmd = "hostname";
+	/* Open the command for reading. */
+	fp = popen(cmd, "r");
+	// If the FilePointer is Null then no need to resume as no data will be fetched.
+	if (fp == NULL)
+	{
+		printf("Failed to run command\n");
+		pclose(fp);
+		return;
+	}
+	fgets(machineName, maxLength, fp);
 	/* close */
 	pclose(fp);
 }

@@ -8,8 +8,8 @@
 #include "systeminfo/systemstats.h"
 #include "socket/handlesocket.h"
 #define SMALLSTRINGBUFFER 32
+#define MAXOUTPUTLENGTH 300
 #define NOENDPOINT "no endpoint"
-#define SYSTEMONLINE "Online"
 int main()
 {
     struct sockaddr_in sockaddr_host;
@@ -57,7 +57,9 @@ int main()
 
         if (strcmp(uri, "/status") == 0)
         {
-            returnResponseData(newSocketfd, headerString, SYSTEMONLINE, strlen(SYSTEMONLINE), strlen(headerString));
+            char machineName[SMALLSTRINGBUFFER];
+            getSystemName(machineName, SMALLSTRINGBUFFER);
+            returnResponseData(newSocketfd, headerString, machineName, strlen(machineName), strlen(headerString));
             continue;
         }
         if (strcmp(uri, "/cpu") == 0)
@@ -102,8 +104,7 @@ int main()
         }
         if (strstr(uri, "/getProccessData") != NULL)
         {
-            int maxOutputLength = 300;
-            char topLine[maxOutputLength];
+            char topLine[MAXOUTPUTLENGTH];
             char *const sep_at = strchr(uri, '=');
             char processName[20];
             if (sep_at == NULL)
@@ -111,7 +112,7 @@ int main()
                 printf("first part: '%s'\nsecond part: '%s'\n", uri, sep_at);
                 goto noendpoint;
             }
-            getProcessesData(topLine, sep_at + 1, maxOutputLength);
+            getProcessesData(topLine, sep_at + 1, MAXOUTPUTLENGTH);
             returnResponseData(newSocketfd, headerString, topLine, strlen(topLine), strlen(headerString));
             continue;
         }
