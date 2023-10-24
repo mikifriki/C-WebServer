@@ -15,7 +15,7 @@ int main()
     struct sockaddr_in sockaddr_host;
     int sockaddrlen = sizeof(sockaddr_host);
     int tcp_socket_fd, newSocketfd, clientAddress, bytesRead, cpuTemp, mem, storageSize;
-    char *headerString = "HTTP/1.0 200 OK\r\n Server: webserver-c r\n Content-type: text/html; charset=UTF-8 \r\n\r\n";
+    char *headerString = "HTTP/1.0 200 OK;\r\nServer: webserver-c;\r\nContent-type: text/plain; charset=UTF-8;\n\n";
     // TCP Layer aka TRANSPORT LAYER. This is the lowest layer I will implement atm
     // 1. Create the socket
     //  Domain: IPv4, Type: STREAM SOCKET as required by TCP, Protocol: 0. as the IP header for TCP has only one protocol then 0 is given.

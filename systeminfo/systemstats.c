@@ -169,7 +169,7 @@ void systemStorageSpace(int *storage, char *storageType)
 void getSystemName(char *machineName, int maxLength)
 {
 	FILE *fp;
-	char *cmd = "hostname";
+	char *cmd = "hostname -s";
 	/* Open the command for reading. */
 	fp = popen(cmd, "r");
 	// If the FilePointer is Null then no need to resume as no data will be fetched.
