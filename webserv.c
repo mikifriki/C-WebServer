@@ -8,7 +8,7 @@
 #include "systeminfo/systemstats.h"
 #include "socket/handlesocket.h"
 #define SMALLSTRINGBUFFER 32
-#define MAXOUTPUTLENGTH 300
+#define MAXOUTPUTLENGTH 400
 #define NOENDPOINT "no endpoint"
 int main()
 {
@@ -100,6 +100,13 @@ int main()
             char storageString[SMALLSTRINGBUFFER];
             snprintf(storageString, SMALLSTRINGBUFFER, "%i", storageSize);
             returnResponseData(newSocketfd, headerString, storageString, strlen(storageString), strlen(headerString));
+            continue;
+        }
+        if (strcmp(uri, "/kernelInfo") == 0)
+        {
+            char kernelInfo[SMALLSTRINGBUFFER];
+            getSystemKernelInfo(kernelInfo, SMALLSTRINGBUFFER);
+            returnResponseData(newSocketfd, headerString, kernelInfo, strlen(kernelInfo), strlen(headerString));
             continue;
         }
         if (strstr(uri, "/getProccessData") != NULL)

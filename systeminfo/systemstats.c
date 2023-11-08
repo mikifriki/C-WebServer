@@ -183,3 +183,41 @@ void getSystemName(char *machineName, int maxLength)
 	/* close */
 	pclose(fp);
 }
+
+void getSystemKernelInfo(char *kernelInfo, int maxLength)
+{
+	FILE *fp;
+	char *cmd = "uname -r -m";
+	/* Open the command for reading. */
+	fp = popen(cmd, "r");
+	// If the FilePointer is Null then no need to resume as no data will be fetched.
+	if (fp == NULL)
+	{
+		printf("Failed to run command\n");
+		pclose(fp);
+		return;
+	}
+	fgets(kernelInfo, maxLength, fp);
+	/* close */
+	pclose(fp);
+}
+
+void getPm2Data(char *pm2Data, char *command, int maxOutputLength)
+{
+	FILE *fp;
+	char baseCmd[150] = "pm2 show ";
+	strcat(baseCmd, command);
+	strcat(baseCmd, "| grep -o 'online\\|offline'");
+	// char *cmd = "top -l 1";
+	fp = popen(baseCmd, "r");
+	int a = 0;
+	if (fp == NULL)
+	{
+		printf("Failed to run command\n");
+		pclose(fp);
+		return;
+	}
+	fgets(pm2Data, maxOutputLength, fp);
+	strcat(pm2Data, "\n");
+	pclose(fp);
+}
