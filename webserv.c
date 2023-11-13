@@ -55,6 +55,13 @@ int main()
         // socket address ip, port, request method, endpoint and HTTP version.
         printf("[%s:%u] %s %s %s\n", inet_ntoa(sockaddr_host.sin_addr), ntohs(sockaddr_host.sin_port), method, uri, version);
 
+        if (strcmp(uri, "/ip") == 0)
+        {
+            char machineIp[SMALLSTRINGBUFFER];
+            getIp(machineIp, SMALLSTRINGBUFFER);
+            returnResponseData(newSocketfd, headerString, machineIp, strlen(machineIp), strlen(headerString));
+            continue;
+        }
         if (strcmp(uri, "/status") == 0)
         {
             char machineName[SMALLSTRINGBUFFER];
@@ -109,11 +116,10 @@ int main()
             returnResponseData(newSocketfd, headerString, kernelInfo, strlen(kernelInfo), strlen(headerString));
             continue;
         }
-        if (strstr(uri, "/getProccessData") != NULL)
+        if (strstr(uri, "/getProccessData") != NULL && strstr(uri, "?process=") != NULL)
         {
             char topLine[MAXOUTPUTLENGTH];
             char *const sep_at = strchr(uri, '=');
-            char processName[20];
             if (sep_at == NULL)
             {
                 printf("first part: '%s'\nsecond part: '%s'\n", uri, sep_at);
@@ -121,6 +127,19 @@ int main()
             }
             getProcessesData(topLine, sep_at + 1, MAXOUTPUTLENGTH);
             returnResponseData(newSocketfd, headerString, topLine, strlen(topLine), strlen(headerString));
+            continue;
+        }
+        if (strstr(uri, "/getPm2Process") != NULL && strstr(uri, "?index=") != NULL)
+        {
+            char pm2Process[MAXOUTPUTLENGTH];
+            char *const uriVariableValue = strchr(uri, '=');
+            if (uriVariableValue == NULL)
+            {
+                printf("first part: '%s'\nsecond part: '%s'\n", uri, uriVariableValue);
+                goto noendpoint;
+            }
+            getPm2Data(pm2Process, uriVariableValue + 1, MAXOUTPUTLENGTH);
+            returnResponseData(newSocketfd, headerString, pm2Process, strlen(pm2Process), strlen(headerString));
             continue;
         }
         goto noendpoint;
