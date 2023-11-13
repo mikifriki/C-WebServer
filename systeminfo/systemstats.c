@@ -108,7 +108,7 @@ void getProcessesData(char *topLine, char *command, int maxOutputLength)
 {
 	FILE *fp;
 	char baseCmd[100] = "top -u steam -bc -n 1  | grep ";
-	strcat(baseCmd, command);
+	strncat(baseCmd, command, maxOutputLength);
 	// char *cmd = "top -l 1";
 	fp = popen(baseCmd, "r");
 	int a = 0;
@@ -119,7 +119,7 @@ void getProcessesData(char *topLine, char *command, int maxOutputLength)
 		return;
 	}
 	fgets(topLine, maxOutputLength, fp);
-	strcat(topLine, "\n");
+	strncat(topLine, "\n", maxOutputLength);
 	pclose(fp);
 }
 
@@ -184,6 +184,24 @@ void getSystemName(char *machineName, int maxLength)
 	pclose(fp);
 }
 
+void getIp(char *ip, int maxLength)
+{
+	FILE *fp;
+	char *cmd = "hostname -I | awk '{print $1}'";
+	/* Open the command for reading. */
+	fp = popen(cmd, "r");
+	// If the FilePointer is Null then no need to resume as no data will be fetched.
+	if (fp == NULL)
+	{
+		printf("Failed to run command\n");
+		pclose(fp);
+		return;
+	}
+	fgets(ip, maxLength, fp);
+	/* close */
+	pclose(fp);
+}
+
 void getSystemKernelInfo(char *kernelInfo, int maxLength)
 {
 	FILE *fp;
@@ -206,9 +224,8 @@ void getPm2Data(char *pm2Data, char *command, int maxOutputLength)
 {
 	FILE *fp;
 	char baseCmd[150] = "pm2 show ";
-	strcat(baseCmd, command);
-	strcat(baseCmd, "| grep -o 'online\\|offline'");
-	// char *cmd = "top -l 1";
+	strncat(baseCmd, command, maxOutputLength);
+	strncat(baseCmd, "| grep -o \"online\\|offline\"", maxOutputLength);
 	fp = popen(baseCmd, "r");
 	int a = 0;
 	if (fp == NULL)
@@ -218,6 +235,6 @@ void getPm2Data(char *pm2Data, char *command, int maxOutputLength)
 		return;
 	}
 	fgets(pm2Data, maxOutputLength, fp);
-	strcat(pm2Data, "\n");
+	strncat(pm2Data, "\n", maxOutputLength);
 	pclose(fp);
 }

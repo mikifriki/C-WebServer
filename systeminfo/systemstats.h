@@ -8,5 +8,8 @@ void getSystemMemoryInformation(int *mem, int memtype);
 void systemStorageSpace(int *storage, char *storageType);
 void getProcessesData(char *topLine, char*command, int maxOutputLength);
 void getSystemName(char *machineName, int maxLength);
+void getIp(char *ip, int maxLength);
 void getSystemKernelInfo(char *kernelInfo, int maxLength);
+void getSystemKernelInfo(char *kernelInfo, int maxLength);
+void getPm2Data(char *pm2Data, char *command, int maxOutputLength);
 #endif
