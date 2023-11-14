@@ -131,14 +131,14 @@ int main()
         }
         if (strstr(uri, "/getPm2Process") != NULL && strstr(uri, "?index=") != NULL)
         {
-            char pm2Process[MAXOUTPUTLENGTH];
+            char pm2Process[SMALLSTRINGBUFFER];
             char *const uriVariableValue = strchr(uri, '=');
             if (uriVariableValue == NULL)
             {
                 printf("first part: '%s'\nsecond part: '%s'\n", uri, uriVariableValue);
                 goto noendpoint;
             }
-            getPm2Data(pm2Process, uriVariableValue + 1, MAXOUTPUTLENGTH);
+            getPm2Data(pm2Process, uriVariableValue + 1, SMALLSTRINGBUFFER);
             returnResponseData(newSocketfd, headerString, pm2Process, strlen(pm2Process), strlen(headerString));
             continue;
         }

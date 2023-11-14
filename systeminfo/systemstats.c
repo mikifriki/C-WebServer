@@ -223,9 +223,8 @@ void getSystemKernelInfo(char *kernelInfo, int maxLength)
 void getPm2Data(char *pm2Data, char *command, int maxOutputLength)
 {
 	FILE *fp;
-	char baseCmd[150] = "pm2 show ";
-	strncat(baseCmd, command, maxOutputLength);
-	strncat(baseCmd, "| grep -o \"online\\|offline\"", maxOutputLength);
+	char baseCmd[150];
+	snprintf(baseCmd, 150, "pm2 show %s | grep -o \"online\\|offline\"", command);
 	fp = popen(baseCmd, "r");
 	int a = 0;
 	if (fp == NULL)
@@ -235,6 +234,8 @@ void getPm2Data(char *pm2Data, char *command, int maxOutputLength)
 		return;
 	}
 	fgets(pm2Data, maxOutputLength, fp);
-	strncat(pm2Data, "\n", maxOutputLength);
+	char result[maxOutputLength];
+	snprintf(result, maxOutputLength, "%s: %s\n", command, pm2Data);
+	strncpy(pm2Data, result, maxOutputLength);
 	pclose(fp);
 }
