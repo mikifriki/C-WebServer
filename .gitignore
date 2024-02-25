@@ -2,3 +2,5 @@
 *.out
 *.s
 main
+log-webserv
+out.*
