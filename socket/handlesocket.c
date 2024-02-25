@@ -4,7 +4,11 @@
 #include <stdio.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include <stdlib.h>
 #include "handlesocket.h"
+
+
+
 int acceptRequest(int *originalSocketfd, int *newSocketfd, struct sockaddr_in sockaddr_host, int sockaddrlen)
 {
     // Sets the file descriptor of the new socket if the accepting is successful.
@@ -90,7 +94,7 @@ int setupSocket(int *socketfd, struct sockaddr_in sockaddr_host, int *sockaddrle
     printf("socket bound successfully\n");
 
     // Now we listen to the created and bound socket
-    // Create a passive scoket
+    // Put the socket in a passive mode
     if (listen(*socketfd, SOMAXCONN) != 0)
     {
         perror("Webserver socket listen error");
@@ -98,4 +102,23 @@ int setupSocket(int *socketfd, struct sockaddr_in sockaddr_host, int *sockaddrle
     }
     printf("Listening to socket\n");
     return 0;
+}
+
+// Generate either a 200 OK or 500 Internal Server Error response header.
+// Returned Char* needs to be freed.
+char* generateHeader(int responseType)
+{
+    char genericHeaderStart[9] = "HTTP/1.0";
+    char genericHeaderEnd[68] = "Server: webserver-c;\r\nContent-type: text/plain; charset=UTF-8;\n\n";
+    int arraySize = strlen(genericHeaderStart) + strlen(genericHeaderEnd) + 30;
+    char* header = malloc(arraySize);
+
+    if (responseType != -1)
+    {
+        snprintf(header, sizeof(header), "%s %s %s; %s", genericHeaderStart, "500", "Internal Server Error", genericHeaderEnd);
+        return header;
+    }
+    snprintf(header, arraySize, "%s %s %s; %s", genericHeaderStart, "200", "OK", genericHeaderEnd);
+
+    return header;
 }

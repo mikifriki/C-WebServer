@@ -7,4 +7,5 @@ int acceptRequest(int *originalSocketfd, int *newSocketfd, struct sockaddr_in so
 int readClientData(int *socketfd, int *clientAddress, struct sockaddr_in *sockaddr_host, int sockaddrlen);
 int readSocketData(int *socketfd, int *readByes, char buffer[]);
 int returnResponseData(int newSocketfd, char *headerString, char*responseString, int headerLength, int responseLength);
+char* generateHeader(int responseType);
 #endif
