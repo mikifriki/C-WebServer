@@ -56,7 +56,10 @@ int main()
         {
             char machineIp[SMALLSTRINGBUFFER];
             getIp(machineIp, SMALLSTRINGBUFFER);
-            returnResponseData(newSocketfd, headerString, machineIp, strlen(machineIp), strlen(headerString));
+            char *header = generateHeader(0);
+
+            returnResponseData(newSocketfd, header, machineIp, strlen(machineIp), strlen(header));
+            free(header);
             continue;
         }
         if (strcmp(uri, "/status") == 0)
@@ -128,7 +131,9 @@ int main()
         {
             char kernelInfo[SMALLSTRINGBUFFER];
             getSystemKernelInfo(kernelInfo, SMALLSTRINGBUFFER);
-            returnResponseData(newSocketfd, headerString, kernelInfo, strlen(kernelInfo), strlen(headerString));
+            char *header = generateHeader(0);
+            returnResponseData(newSocketfd, header, kernelInfo, strlen(kernelInfo), strlen(header));
+            free(header);
             continue;
         }
         if (strstr(uri, "/getProccessData") != NULL && strstr(uri, "?process=") != NULL)
@@ -141,7 +146,9 @@ int main()
                 goto noendpoint;
             }
             getProcessesData(topLine, sep_at + 1, MAXOUTPUTLENGTH);
-            returnResponseData(newSocketfd, headerString, topLine, strlen(topLine), strlen(headerString));
+            char *header = generateHeader(0);
+            returnResponseData(newSocketfd, header, topLine, strlen(topLine), strlen(header));
+            free(header);
             continue;
         }
         if (strstr(uri, "/getPm2Process") != NULL && strstr(uri, "?index=") != NULL)
@@ -154,7 +161,9 @@ int main()
                 goto noendpoint;
             }
             getPm2Data(pm2Process, uriVariableValue + 1, SMALLSTRINGBUFFER);
-            returnResponseData(newSocketfd, headerString, pm2Process, strlen(pm2Process), strlen(headerString));
+            char *header = generateHeader(0);
+            returnResponseData(newSocketfd, header, pm2Process, strlen(pm2Process), strlen(header));
+            free(header);
             continue;
         }
         goto noendpoint;
