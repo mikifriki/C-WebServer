@@ -15,6 +15,7 @@ int main()
     struct sockaddr_in sockaddr_host;
     int sockaddrlen = sizeof(sockaddr_host);
     int tcp_socket_fd, newSocketfd, clientAddress, bytesRead, cpuTemp, mem, storageSize;
+
     // TCP Layer aka TRANSPORT LAYER.
     // 1. Create the socket
     //  Domain: IPv4, Type: STREAM SOCKET as required by TCP, Protocol: 0. as the IP header for TCP has only one protocol then 0 is given.
@@ -27,6 +28,7 @@ int main()
     // Now we go onto accept the incoming connections
     for (;;)
     {
+        char* genericHeader = generateHeader(0);
         if (acceptRequest(&tcp_socket_fd, &newSocketfd, sockaddr_host, sockaddrlen) == -1)
         {
             continue;
@@ -55,8 +57,8 @@ int main()
         if (strcmp(uri, "/ip") == 0)
         {
             char machineIp[SMALLSTRINGBUFFER];
-            getIp(machineIp, SMALLSTRINGBUFFER);
-            char *header = generateHeader(0);
+            int returnCode = getIp(machineIp, SMALLSTRINGBUFFER);
+            char *header = generateHeader(returnCode);
 
             returnResponseData(newSocketfd, header, machineIp, strlen(machineIp), strlen(header));
             free(header);
@@ -65,8 +67,8 @@ int main()
         if (strcmp(uri, "/status") == 0)
         {
             char machineName[SMALLSTRINGBUFFER];
-            getSystemName(machineName, SMALLSTRINGBUFFER);
-            char *header = generateHeader(0);
+            int returnCode = getSystemName(machineName, SMALLSTRINGBUFFER);
+            char *header = generateHeader(returnCode);
 
             returnResponseData(newSocketfd, header, machineName, strlen(machineName), strlen(header));
             free(header);
@@ -85,10 +87,10 @@ int main()
         }
         if (strcmp(uri, "/memTotal") == 0)
         {
-            getSystemMemoryInformation(&mem, 0);
+            int returnCode = getSystemMemoryInformation(&mem, 0);
             char memString[SMALLSTRINGBUFFER];
             snprintf(memString, SMALLSTRINGBUFFER, "%i", mem);
-            char *header = generateHeader(0);
+            char *header = generateHeader(returnCode);
 
             returnResponseData(newSocketfd, header, memString, strlen(memString), strlen(header));
             free(header);
@@ -96,10 +98,10 @@ int main()
         }
         if (strcmp(uri, "/memAvailable") == 0)
         {
-            getSystemMemoryInformation(&mem, 1);
+            int returnCode = getSystemMemoryInformation(&mem, 1);
             char memString[SMALLSTRINGBUFFER];
             snprintf(memString, SMALLSTRINGBUFFER, "%i", mem);
-            char *header = generateHeader(0);
+            char *header = generateHeader(returnCode);
 
             returnResponseData(newSocketfd, header, memString, strlen(memString), strlen(header));
             free(header);
@@ -107,10 +109,10 @@ int main()
         }
         if (strcmp(uri, "/totalStorage") == 0)
         {
-            systemStorageSpace(&storageSize, "total");
+            int returnCode = systemStorageSpace(&storageSize, "total");
             char storageString[SMALLSTRINGBUFFER];
             snprintf(storageString, SMALLSTRINGBUFFER, "%i", storageSize);
-            char *header = generateHeader(0);
+            char *header = generateHeader(returnCode);
 
             returnResponseData(newSocketfd, header, storageString, strlen(storageString), strlen(header));
             free(header);
@@ -118,10 +120,10 @@ int main()
         }
         if (strcmp(uri, "/availableStorage") == 0)
         {
-            systemStorageSpace(&storageSize, "available");
+            int returnCode = systemStorageSpace(&storageSize, "available");
             char storageString[SMALLSTRINGBUFFER];
             snprintf(storageString, SMALLSTRINGBUFFER, "%i", storageSize);
-            char *header = generateHeader(0);
+            char *header = generateHeader(returnCode);
 
             returnResponseData(newSocketfd, header, storageString, strlen(storageString), strlen(header));
             free(header);
@@ -130,8 +132,8 @@ int main()
         if (strcmp(uri, "/kernelInfo") == 0)
         {
             char kernelInfo[SMALLSTRINGBUFFER];
-            getSystemKernelInfo(kernelInfo, SMALLSTRINGBUFFER);
-            char *header = generateHeader(0);
+            int returnCode = getSystemKernelInfo(kernelInfo, SMALLSTRINGBUFFER);
+            char *header = generateHeader(returnCode);
             returnResponseData(newSocketfd, header, kernelInfo, strlen(kernelInfo), strlen(header));
             free(header);
             continue;
@@ -145,8 +147,8 @@ int main()
                 printf("first part: '%s'\nsecond part: '%s'\n", uri, sep_at);
                 goto noendpoint;
             }
-            getProcessesData(topLine, sep_at + 1, MAXOUTPUTLENGTH);
-            char *header = generateHeader(0);
+            int returnCode = getProcessesData(topLine, sep_at + 1, MAXOUTPUTLENGTH);
+            char *header = generateHeader(returnCode);
             returnResponseData(newSocketfd, header, topLine, strlen(topLine), strlen(header));
             free(header);
             continue;
@@ -160,8 +162,8 @@ int main()
                 printf("first part: '%s'\nsecond part: '%s'\n", uri, uriVariableValue);
                 goto noendpoint;
             }
-            getPm2Data(pm2Process, uriVariableValue + 1, SMALLSTRINGBUFFER);
-            char *header = generateHeader(0);
+            int returnCode = getPm2Data(pm2Process, uriVariableValue + 1, SMALLSTRINGBUFFER);
+            char *header = generateHeader(returnCode);
             returnResponseData(newSocketfd, header, pm2Process, strlen(pm2Process), strlen(header));
             free(header);
             continue;
@@ -170,9 +172,8 @@ int main()
 
     // Default end if no results are found
     noendpoint:
-        char *header = generateHeader(0);
-        returnResponseData(newSocketfd, header, NOENDPOINT, strlen(NOENDPOINT), strlen(header));
-        free(header);
+        returnResponseData(newSocketfd, genericHeader, NOENDPOINT, strlen(NOENDPOINT), strlen(genericHeader));
+        free(genericHeader);
         continue;
     }
 

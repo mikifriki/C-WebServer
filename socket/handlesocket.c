@@ -7,8 +7,6 @@
 #include <stdlib.h>
 #include "handlesocket.h"
 
-
-
 int acceptRequest(int *originalSocketfd, int *newSocketfd, struct sockaddr_in sockaddr_host, int sockaddrlen)
 {
     // Sets the file descriptor of the new socket if the accepting is successful.
@@ -106,19 +104,20 @@ int setupSocket(int *socketfd, struct sockaddr_in sockaddr_host, int *sockaddrle
 
 // Generate either a 200 OK or 500 Internal Server Error response header.
 // Returned Char* needs to be freed.
-char* generateHeader(int responseType)
+char *generateHeader(int responseType)
 {
     char genericHeaderStart[9] = "HTTP/1.0";
     char genericHeaderEnd[68] = "Server: webserver-c;\r\nContent-type: text/plain; charset=UTF-8;\n\n";
     int arraySize = strlen(genericHeaderStart) + strlen(genericHeaderEnd) + 30;
-    char* header = malloc(arraySize);
+    char *header = malloc(arraySize);
 
     if (responseType != -1)
     {
-        snprintf(header, sizeof(header), "%s %s %s; %s", genericHeaderStart, "500", "Internal Server Error", genericHeaderEnd);
+
+        snprintf(header, arraySize, "%s %s %s; %s", genericHeaderStart, "200", "OK", genericHeaderEnd);
         return header;
     }
-    snprintf(header, arraySize, "%s %s %s; %s", genericHeaderStart, "200", "OK", genericHeaderEnd);
 
+    snprintf(header, arraySize, "%s %s %s; %s", genericHeaderStart, "500", "Internal Server Error", genericHeaderEnd);
     return header;
 }

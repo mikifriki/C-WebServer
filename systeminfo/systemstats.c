@@ -6,7 +6,7 @@
 // Value of 1024*1024
 #define MB 1048576;
 
-static void returnStorageSize(char **pointerchar, char *storageType)
+int returnStorageSize(char **pointerchar, char *storageType)
 {
 	int readLine = 0;
 	while (*pointerchar != NULL)
@@ -26,9 +26,10 @@ static void returnStorageSize(char **pointerchar, char *storageType)
 		}
 		*pointerchar = strtok(NULL, " ");
 	}
+	return 0;
 }
 
-void cpuTemperature(int *temp)
+int cpuTemperature(int *temp)
 {
 	FILE *fptr;
 	fptr = fopen("/sys/class/thermal/thermal_zone3/temp", "r");
@@ -37,15 +38,16 @@ void cpuTemperature(int *temp)
 		printf("Failed to read cpu temp\n");
 		fclose(fptr);
 		*temp = -1;
-		return;
+		return -1;
 	}
 	fscanf(fptr, "%i", temp);
 	*temp = *temp / 1000;
 	fclose(fptr);
+	return 0;
 }
 
 //  Returns available memory of system in kb as given my meminfo.
-void getSystemMemoryInformation(int *mem, int memtype)
+int getSystemMemoryInformation(int *mem, int memtype)
 {
 	FILE *fp;
 	char *cmd = "cat /proc/meminfo | grep -i 'memtotal' | grep -o '[[:digit:]]*'";
@@ -60,11 +62,12 @@ void getSystemMemoryInformation(int *mem, int memtype)
 	{
 		printf("Failed to run command\n");
 		pclose(fp);
-		return;
+		return -1;
 	}
 	fscanf(fp, "%i", mem);
 	/* close */
 	pclose(fp);
+	return 0;
 }
 
 // Reads the current total running processes on the machine
@@ -105,7 +108,7 @@ void getSystemMemoryInformation(int *mem, int memtype)
 
 // Returns the top line of the given command.
 // this data includes cpu and ram usage. It also incldues uptime of the proccess.
-void getProcessesData(char *topLine, char *command, int maxOutputLength)
+int getProcessesData(char *topLine, char *command, int maxOutputLength)
 {
 	FILE *fp;
 	char baseCmd[100] = "top -u steam -bc -n 1  | grep ";
@@ -117,21 +120,22 @@ void getProcessesData(char *topLine, char *command, int maxOutputLength)
 	{
 		printf("Failed to run command\n");
 		pclose(fp);
-		return;
+		return -1;
 	}
 	fgets(topLine, maxOutputLength, fp);
 	strncat(topLine, "\n", maxOutputLength);
 	pclose(fp);
+	return 0;
 }
 
 // Returns storage size based off of storageType.
 // gets available or total.
 // returns nothing if none of these strings are given.
-void systemStorageSpace(int *storage, char *storageType)
+int systemStorageSpace(int *storage, char *storageType)
 {
 	if (strcasecmp(storageType, TOTALSTORAGE) != 0 && strcasecmp(storageType, AVAILABLESTORAGE) != 0)
 	{
-		return;
+		return -1;
 	}
 	FILE *fp;
 	char *cmd = "df -H /";
@@ -142,7 +146,7 @@ void systemStorageSpace(int *storage, char *storageType)
 	{
 		printf("Failed to read disk space command\n");
 		fclose(fp);
-		return;
+		return -1;
 	}
 
 	char tokenizedString[150];
@@ -165,9 +169,10 @@ void systemStorageSpace(int *storage, char *storageType)
 	*storage = atoi(pointerchar);
 	/* close */
 	pclose(fp);
+	return 0;
 }
 
-void getSystemName(char *machineName, int maxLength)
+int getSystemName(char *machineName, int maxLength)
 {
 	FILE *fp;
 	char *cmd = "hostname -s";
@@ -178,14 +183,15 @@ void getSystemName(char *machineName, int maxLength)
 	{
 		printf("Failed to run command\n");
 		pclose(fp);
-		return;
+		return -1;
 	}
 	fgets(machineName, maxLength, fp);
 	/* close */
 	pclose(fp);
+	return 0;
 }
 
-void getIp(char *ip, int maxLength)
+int getIp(char *ip, int maxLength)
 {
 	FILE *fp;
 	char *cmd = "hostname -I | awk '{print $1}'";
@@ -196,14 +202,15 @@ void getIp(char *ip, int maxLength)
 	{
 		printf("Failed to run command\n");
 		pclose(fp);
-		return;
+		return -1;
 	}
 	fgets(ip, maxLength, fp);
 	/* close */
 	pclose(fp);
+	return 0;
 }
 
-void getSystemKernelInfo(char *kernelInfo, int maxLength)
+int getSystemKernelInfo(char *kernelInfo, int maxLength)
 {
 	FILE *fp;
 	char *cmd = "uname -r -m";
@@ -214,14 +221,15 @@ void getSystemKernelInfo(char *kernelInfo, int maxLength)
 	{
 		printf("Failed to run command\n");
 		pclose(fp);
-		return;
+		return -1;
 	}
 	fgets(kernelInfo, maxLength, fp);
 	/* close */
 	pclose(fp);
+	return 0;
 }
 
-void getPm2Data(char *pm2Data, char *command, int maxOutputLength)
+int getPm2Data(char *pm2Data, char *command, int maxOutputLength)
 {
 	FILE *fp;
 	char baseCmd[150];
@@ -232,11 +240,12 @@ void getPm2Data(char *pm2Data, char *command, int maxOutputLength)
 	{
 		printf("Failed to run command\n");
 		pclose(fp);
-		return;
+		return -1;
 	}
 	fgets(pm2Data, maxOutputLength, fp);
 	char result[maxOutputLength];
 	snprintf(result, maxOutputLength, "%s: %s\n", command, pm2Data);
 	strncpy(pm2Data, result, maxOutputLength);
 	pclose(fp);
+	return 0;
 }

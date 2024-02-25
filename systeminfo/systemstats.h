@@ -2,14 +2,14 @@
 #define SYSSTAT_HEADER
 #define TOTALSTORAGE "total"
 #define AVAILABLESTORAGE "available"
-void cpuTemperature(int *temp);
-void getSystemMemoryInformation(int *mem, int memtype);
+int cpuTemperature(int *temp);
+int getSystemMemoryInformation(int *mem, int memtype);
 // void getTotalProcesses();
-void systemStorageSpace(int *storage, char *storageType);
-void getProcessesData(char *topLine, char*command, int maxOutputLength);
-void getSystemName(char *machineName, int maxLength);
-void getIp(char *ip, int maxLength);
-void getSystemKernelInfo(char *kernelInfo, int maxLength);
-void getSystemKernelInfo(char *kernelInfo, int maxLength);
-void getPm2Data(char *pm2Data, char *command, int maxOutputLength);
+int systemStorageSpace(int *storage, char *storageType);
+int getProcessesData(char *topLine, char*command, int maxOutputLength);
+int getSystemName(char *machineName, int maxLength);
+int getIp(char *ip, int maxLength);
+int getSystemKernelInfo(char *kernelInfo, int maxLength);
+int getSystemKernelInfo(char *kernelInfo, int maxLength);
+int getPm2Data(char *pm2Data, char *command, int maxOutputLength);
 #endif
