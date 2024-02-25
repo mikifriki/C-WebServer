@@ -36,6 +36,7 @@ void cpuTemperature(int *temp)
 	{
 		printf("Failed to read cpu temp\n");
 		fclose(fptr);
+		*temp = -1;
 		return;
 	}
 	fscanf(fptr, "%i", temp);
