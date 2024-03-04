@@ -6,6 +6,25 @@
 // Value of 1024*1024
 #define MB 1048576;
 
+// Read common CLI command with popen and fill the passed string if sucessfull
+int readCommonComand(char *cmd, char* string,int maxLength)
+{
+	FILE *fp;
+	/* Open the command for reading. */
+	fp = popen(cmd, "r");
+	// If the FilePointer is Null then no need to resume as no data will be fetched.
+	if (fp == NULL)
+	{
+		printf("Failed to run command\n");
+		pclose(fp);
+		return -1;
+	}
+	fgets(string, maxLength, fp);
+	/* close */
+	pclose(fp);
+	return 0;
+}
+
 int returnStorageSize(char **pointerchar, char *storageType)
 {
 	int readLine = 0;
@@ -110,22 +129,11 @@ int getSystemMemoryInformation(int *mem, int memtype)
 // this data includes cpu and ram usage. It also incldues uptime of the proccess.
 int getProcessesData(char *topLine, char *command, int maxOutputLength)
 {
-	FILE *fp;
 	char baseCmd[100] = "top -u steam -bc -n 1  | grep ";
 	strncat(baseCmd, command, maxOutputLength);
-	// char *cmd = "top -l 1";
-	fp = popen(baseCmd, "r");
-	int a = 0;
-	if (fp == NULL)
-	{
-		printf("Failed to run command\n");
-		pclose(fp);
-		return -1;
-	}
-	fgets(topLine, maxOutputLength, fp);
+	int returnCode = readCommonComand(command, topLine, maxOutputLength);
 	strncat(topLine, "\n", maxOutputLength);
-	pclose(fp);
-	return 0;
+	return returnCode;
 }
 
 // Returns storage size based off of storageType.
@@ -174,59 +182,20 @@ int systemStorageSpace(int *storage, char *storageType)
 
 int getSystemName(char *machineName, int maxLength)
 {
-	FILE *fp;
 	char *cmd = "hostname -s";
-	/* Open the command for reading. */
-	fp = popen(cmd, "r");
-	// If the FilePointer is Null then no need to resume as no data will be fetched.
-	if (fp == NULL)
-	{
-		printf("Failed to run command\n");
-		pclose(fp);
-		return -1;
-	}
-	fgets(machineName, maxLength, fp);
-	/* close */
-	pclose(fp);
-	return 0;
+	return readCommonComand(cmd, machineName, maxLength);
 }
 
 int getIp(char *ip, int maxLength)
-{
-	FILE *fp;
+{	
 	char *cmd = "hostname -I | awk '{print $1}'";
-	/* Open the command for reading. */
-	fp = popen(cmd, "r");
-	// If the FilePointer is Null then no need to resume as no data will be fetched.
-	if (fp == NULL)
-	{
-		printf("Failed to run command\n");
-		pclose(fp);
-		return -1;
-	}
-	fgets(ip, maxLength, fp);
-	/* close */
-	pclose(fp);
-	return 0;
+	return readCommonComand(cmd, ip, maxLength);
 }
 
 int getSystemKernelInfo(char *kernelInfo, int maxLength)
 {
-	FILE *fp;
 	char *cmd = "uname -r -m";
-	/* Open the command for reading. */
-	fp = popen(cmd, "r");
-	// If the FilePointer is Null then no need to resume as no data will be fetched.
-	if (fp == NULL)
-	{
-		printf("Failed to run command\n");
-		pclose(fp);
-		return -1;
-	}
-	fgets(kernelInfo, maxLength, fp);
-	/* close */
-	pclose(fp);
-	return 0;
+	return readCommonComand(cmd, kernelInfo, maxLength);
 }
 
 int getPm2Data(char *pm2Data, char *command, int maxOutputLength)

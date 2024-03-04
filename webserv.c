@@ -56,7 +56,7 @@ int main()
 
         if (strcmp(uri, "/ip") == 0)
         {
-            char machineIp[SMALLSTRINGBUFFER];
+            char machineIp[SMALLSTRINGBUFFER] = "";
             int returnCode = getIp(machineIp, SMALLSTRINGBUFFER);
             char *header = generateHeader(returnCode);
 
@@ -66,7 +66,7 @@ int main()
         }
         if (strcmp(uri, "/status") == 0)
         {
-            char machineName[SMALLSTRINGBUFFER];
+            char machineName[SMALLSTRINGBUFFER] = "";
             int returnCode = getSystemName(machineName, SMALLSTRINGBUFFER);
             char *header = generateHeader(returnCode);
 
@@ -77,7 +77,7 @@ int main()
         if (strcmp(uri, "/cpu") == 0)
         {
             cpuTemperature(&cpuTemp);
-            char cpuTempString[SMALLSTRINGBUFFER];
+            char cpuTempString[SMALLSTRINGBUFFER] = "";
             snprintf(cpuTempString, SMALLSTRINGBUFFER, "%i", cpuTemp);
             char *header = generateHeader(cpuTemp);
 
@@ -88,7 +88,7 @@ int main()
         if (strcmp(uri, "/memTotal") == 0)
         {
             int returnCode = getSystemMemoryInformation(&mem, 0);
-            char memString[SMALLSTRINGBUFFER];
+            char memString[SMALLSTRINGBUFFER] = "";
             snprintf(memString, SMALLSTRINGBUFFER, "%i", mem);
             char *header = generateHeader(returnCode);
 
@@ -99,7 +99,7 @@ int main()
         if (strcmp(uri, "/memAvailable") == 0)
         {
             int returnCode = getSystemMemoryInformation(&mem, 1);
-            char memString[SMALLSTRINGBUFFER];
+            char memString[SMALLSTRINGBUFFER] = "";
             snprintf(memString, SMALLSTRINGBUFFER, "%i", mem);
             char *header = generateHeader(returnCode);
 
@@ -110,7 +110,7 @@ int main()
         if (strcmp(uri, "/totalStorage") == 0)
         {
             int returnCode = systemStorageSpace(&storageSize, "total");
-            char storageString[SMALLSTRINGBUFFER];
+            char storageString[SMALLSTRINGBUFFER] = "";
             snprintf(storageString, SMALLSTRINGBUFFER, "%i", storageSize);
             char *header = generateHeader(returnCode);
 
@@ -121,7 +121,7 @@ int main()
         if (strcmp(uri, "/availableStorage") == 0)
         {
             int returnCode = systemStorageSpace(&storageSize, "available");
-            char storageString[SMALLSTRINGBUFFER];
+            char storageString[SMALLSTRINGBUFFER] = "";
             snprintf(storageString, SMALLSTRINGBUFFER, "%i", storageSize);
             char *header = generateHeader(returnCode);
 
@@ -131,7 +131,7 @@ int main()
         }
         if (strcmp(uri, "/kernelInfo") == 0)
         {
-            char kernelInfo[SMALLSTRINGBUFFER];
+            char kernelInfo[SMALLSTRINGBUFFER] = "";
             int returnCode = getSystemKernelInfo(kernelInfo, SMALLSTRINGBUFFER);
             char *header = generateHeader(returnCode);
             returnResponseData(newSocketfd, header, kernelInfo, strlen(kernelInfo), strlen(header));
@@ -140,7 +140,7 @@ int main()
         }
         if (strstr(uri, "/getProccessData") != NULL && strstr(uri, "?process=") != NULL)
         {
-            char topLine[MAXOUTPUTLENGTH];
+            char topLine[MAXOUTPUTLENGTH] = "";
             char *const sep_at = strchr(uri, '=');
             if (sep_at == NULL)
             {
@@ -155,7 +155,7 @@ int main()
         }
         if (strstr(uri, "/getPm2Process") != NULL && strstr(uri, "?index=") != NULL)
         {
-            char pm2Process[SMALLSTRINGBUFFER];
+            char pm2Process[SMALLSTRINGBUFFER] = "";
             char *const uriVariableValue = strchr(uri, '=');
             if (uriVariableValue == NULL)
             {
