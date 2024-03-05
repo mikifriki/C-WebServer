@@ -7,8 +7,6 @@
 #include <sys/socket.h>
 #include "systeminfo/systemstats.h"
 #include "socket/handlesocket.h"
-#define SMALLSTRINGBUFFER 32
-#define MAXOUTPUTLENGTH 400
 #define NOENDPOINT "no endpoint"
 int main()
 {

@@ -198,23 +198,14 @@ int getSystemKernelInfo(char *kernelInfo, int maxLength)
 	return readCommonComand(cmd, kernelInfo, maxLength);
 }
 
+// This should be refactored and be changed to try and use a single char array.
 int getPm2Data(char *pm2Data, char *command, int maxOutputLength)
 {
-	FILE *fp;
-	char baseCmd[150];
-	snprintf(baseCmd, 150, "pm2 show %s | grep -o \"online\\|offline\"", command);
-	fp = popen(baseCmd, "r");
-	int a = 0;
-	if (fp == NULL)
-	{
-		printf("Failed to run command\n");
-		pclose(fp);
-		return -1;
-	}
-	fgets(pm2Data, maxOutputLength, fp);
+	char baseCmd[150] = "";
 	char result[maxOutputLength];
+	snprintf(baseCmd, 150, "pm2 show %s | grep -o \"online\\|offline\"", command);
+	int returnCode = readCommonComand(command, pm2Data, maxOutputLength);
 	snprintf(result, maxOutputLength, "%s: %s\n", command, pm2Data);
 	strncpy(pm2Data, result, maxOutputLength);
-	pclose(fp);
-	return 0;
+	return returnCode;
 }

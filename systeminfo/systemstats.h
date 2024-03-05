@@ -2,6 +2,8 @@
 #define SYSSTAT_HEADER
 #define TOTALSTORAGE "total"
 #define AVAILABLESTORAGE "available"
+#define SMALLSTRINGBUFFER 32
+#define MAXOUTPUTLENGTH 400
 int cpuTemperature(int *temp);
 int getSystemMemoryInformation(int *mem, int memtype);
 // void getTotalProcesses();
